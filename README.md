@@ -1,5 +1,8 @@
 # cna-cs-template
 
+> **Status: In progress - ZATÍM NEFUNKČNÍ**
+
+
 Modern template for CNA C# applications, also compatible with MonoGame, FNA, and Kni.
 
 ## Features
