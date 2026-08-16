@@ -88,7 +88,8 @@ public class HelloGame : Game
         try { return (GraphicsDevice as dynamic).SupportsCapability(capability); } catch { return capability == "ThreeD" || capability == "DepthStencilBuffer"; }
 #else
         // XNA 4.0 fallback: Reach vs HiDef
-        if (capability == "ThreeD") return GraphicsDevice.GraphicsProfile == GraphicsProfile.HiDef;
+        // Both Reach and HiDef support 3D and depth buffers in XNA 4.0
+        if (capability == "ThreeD") return true;
         if (capability == "DepthStencilBuffer") return true;
         return false;
 #endif
