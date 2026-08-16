@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace CNA.NET.Template;
 
@@ -7,7 +8,8 @@ public static class Program
     [STAThread]
     static void Main(string[] args)
     {
-        using var game = new HelloGame();
+        bool smokeTest = args.Contains("--smoke-test");
+        using var game = new HelloGame(smokeTest);
         game.Run();
     }
 }

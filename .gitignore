@@ -1,7 +1,24 @@
+# .NET build artefacts
 [Bb]in/
 [Oo]bj/
+out/
+
+# IDEs
+.idea/
+.vs/
+.vscode/
+*.swp
 *.user
 *.userosscache
 *.sln.doccache
 *.suo
-.vs/
+
+# Project specific
+Content/bin/
+Content/obj/
+
+# Misc
+.DS_Store
+__pycache__/
+*.pyc
+.claude/*

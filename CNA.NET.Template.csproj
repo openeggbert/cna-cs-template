@@ -5,10 +5,46 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>CNA.NET.Template</RootNamespace>
+    
+    <!-- Engine selection: CNA, MonoGame, FNA, or Kni -->
+    <Engine Condition="'$(Engine)' == ''">CNA</Engine>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Conditional Constants -->
+  <PropertyGroup Condition="'$(Engine)' == 'CNA'">
+    <DefineConstants>$(DefineConstants);ENGINE_CNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'MonoGame'">
+    <DefineConstants>$(DefineConstants);ENGINE_MONOGAME</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'FNA'">
+    <DefineConstants>$(DefineConstants);ENGINE_FNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'Kni'">
+    <DefineConstants>$(DefineConstants);ENGINE_KNI</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Package/Reference selection -->
+  <ItemGroup Condition="'$(Engine)' == 'CNA'">
     <PackageReference Include="CNA.Framework" Version="1.0.0-preview" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Engine)' == 'MonoGame'">
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Engine)' == 'FNA'">
+    <!-- Assuming FNA is locally available or linked as a project -->
+    <Reference Include="FNA">
+      <HintPath>libs\FNA.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Engine)' == 'Kni'">
+    <PackageReference Include="nkast.Xna.Framework" Version="3.9.1" />
+    <PackageReference Include="nkast.Xna.Framework.Content" Version="3.9.1" />
   </ItemGroup>
 
   <ItemGroup>

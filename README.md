@@ -1,14 +1,46 @@
-# cna-dotnet-template
+# cna-cs-template
 
-Template for CNA Dotnet applications.
+Modern template for CNA C# applications, also compatible with MonoGame, FNA, and Kni.
 
-## About
+## Features
 
-This is a starter template for building games and applications using the [CNA](https://github.com/openeggbert/cna) framework with the Dotnet binding.
+- **Adaptive Rendering**: Automatically switches between a 3D rotating cube (HiDef/3D capable) and a bouncing 2D logo (Reach/2D only).
+- **Renderer Banner**: Displays the name of the active graphics renderer during the first 5 seconds.
+- **Multi-Engine Support**: Easily switch between different XNA-based engines using the `Engine` property.
+- **Cross-Platform**: Designed to run on Windows, Linux, macOS, Android, iOS, and Web.
 
 ## Getting Started
 
-*(Instructions will be added when the Dotnet binding is complete)*
+### Prerequisites
+
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+
+### Building and Running
+
+You can choose the engine by passing the `Engine` property to `dotnet build` or `dotnet run`. Supported values are `CNA` (default), `MonoGame`, `FNA`, and `Kni`.
+
+#### Using CNA (default)
+```bash
+dotnet run
+```
+
+#### Using MonoGame
+```bash
+dotnet run -p:Engine=MonoGame
+```
+
+#### Using Kni
+```bash
+dotnet run -p:Engine=Kni
+```
+
+### Automation
+
+The template supports a "smoke test" mode which runs for 3 frames and then exits. This is useful for CI/CD pipelines.
+
+```bash
+dotnet run -- --smoke-test
+```
 
 ## License
 
