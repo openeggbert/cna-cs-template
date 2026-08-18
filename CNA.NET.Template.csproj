@@ -5,7 +5,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>CNA.NET.Template</RootNamespace>
+    <!-- Not CNA.NET.Template: that namespace nests under CNA, which collides with cna-cs's own
+         root CNA namespace and makes bare Game/Color/PlayerIndex (etc.) resolve to CNA's own
+         types instead of Microsoft.Xna.Framework's compat ones, even with `using
+         Microsoft.Xna.Framework;` in scope: an enclosing namespace's members shadow a using
+         directive's imports in C#. -->
+    <RootNamespace>CnaCsTemplate</RootNamespace>
     
     <!-- Engine selection: CNA, MonoGame, FNA, or Kni -->
     <Engine Condition="'$(Engine)' == ''">CNA</Engine>
@@ -27,7 +32,9 @@
 
   <!-- Package/Reference selection -->
   <ItemGroup Condition="'$(Engine)' == 'CNA'">
-    <PackageReference Include="CNA.Framework" Version="1.0.0-preview" />
+    <!-- No published CNA.Framework NuGet package exists yet, so this references the sibling
+         cna-cs checkout directly. CNA.XnaCompat pulls in CNA.Framework transitively. -->
+    <ProjectReference Include="..\cna-cs\src\CNA.XnaCompat\CNA.XnaCompat.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Engine)' == 'MonoGame'">

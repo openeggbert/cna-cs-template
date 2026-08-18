@@ -1,6 +1,7 @@
 # cna-cs-template
 
-> **Status: In progress - NOT YET FUNCTIONAL**
+> **Status: Builds and links against a local `cna-cs` checkout (`Engine=CNA`); runtime behavior
+> is unverified (no environment with a real `cna-native` shared library has run it yet).**
 
 
 Modern template for CNA C# applications, also compatible with MonoGame, FNA, and Kni.
@@ -23,6 +24,11 @@ Modern template for CNA C# applications, also compatible with MonoGame, FNA, and
 You can choose the engine by passing the `Engine` property to `dotnet build` or `dotnet run`. Supported values are `CNA` (default), `MonoGame`, `FNA`, and `Kni`.
 
 #### Using CNA (default)
+
+No published `CNA.Framework` NuGet package exists yet, so `Engine=CNA` references a sibling
+`cna-cs` checkout by relative path (`../cna-cs`) instead. Clone
+[openeggbert/cna-cs](https://github.com/openeggbert/cna-cs) next to this repository first.
+
 ```bash
 dotnet run
 ```

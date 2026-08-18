@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace CNA.NET.Template;
+namespace CnaCsTemplate;
 
 public static class Program
 {
