@@ -49,9 +49,18 @@
     </Reference>
   </ItemGroup>
 
+  <!--
+    Both pinned to the same version. They were 3.9.1, and nkast.Xna.Framework.Content 3.9.1
+    resolves to 3.11.9001, which drags nkast.Xna.Framework up with it; that is a package downgrade
+    and NU1605 turns it into an error. So Engine=Kni did not build at all while the README listed
+    it as supported.
+  -->
   <ItemGroup Condition="'$(Engine)' == 'Kni'">
-    <PackageReference Include="nkast.Xna.Framework" Version="3.9.1" />
-    <PackageReference Include="nkast.Xna.Framework.Content" Version="3.9.1" />
+    <PackageReference Include="nkast.Xna.Framework" Version="3.12.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Content" Version="3.12.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Graphics" Version="3.12.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Input" Version="3.12.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Game" Version="3.12.9001" />
   </ItemGroup>
 
   <ItemGroup>

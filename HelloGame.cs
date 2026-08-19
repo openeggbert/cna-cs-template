@@ -9,17 +9,16 @@ namespace CnaCsTemplate;
 public class HelloGame : Game
 {
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
-    private BasicEffect _cubeEffect;
-    private Texture2D _logo;
-    private Texture2D _solid;
+    private SpriteBatch _spriteBatch = null!;
+    private BasicEffect _cubeEffect = null!;
+    private Texture2D _logo = null!;
+    private Texture2D _solid = null!;
     private Vector2 _position;
     private Vector2 _velocity;
     private string _rendererName = "Unknown";
     private float _animationSeconds;
     private bool _supports3D;
     private bool _supportsDepth;
-    private bool _hasWindow;
     private readonly bool _smokeTest;
     private int _drawnFrames;
 
@@ -53,7 +52,6 @@ public class HelloGame : Game
 
         _supports3D = SupportsCapability(GraphicsCapability.ThreeD);
         _supportsDepth = SupportsCapability(GraphicsCapability.DepthStencilBuffer);
-        _hasWindow = true; // Most XNA frameworks assume a window if running
 
         if (_supports3D)
         {
