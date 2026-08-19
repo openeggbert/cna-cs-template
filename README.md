@@ -1,7 +1,16 @@
 # cna-cs-template
 
-> **Status: Builds and links against a local `cna-cs` checkout (`Engine=CNA`); runtime behavior
-> is unverified (no environment with a real `cna-native` shared library has run it yet).**
+> **Status: builds and runs.** Verified headless on 2026-08-19 against both CNA renderers:
+>
+> | renderer | exit | 3D pipeline | frames |
+> |---|---|---|---|
+> | `SOFTWARE` | 0 | yes | 3 |
+> | `SDL_RENDERER` | 0 | no (2D only) | 3 |
+>
+> The previous status line said runtime behaviour was unverified "because no environment with a
+> real `cna-native` shared library has run it yet". The library existed the whole time; it is
+> built as `libcna_c_api.so`, while the binding asks the loader for `cna-native`. Two names, no
+> match, and the failure got read as a missing library. `cna-cs` now resolves between them.
 
 
 Modern template for CNA C# applications, also compatible with MonoGame, FNA, and Kni.
@@ -29,9 +38,20 @@ No published `CNA.Framework` NuGet package exists yet, so `Engine=CNA` reference
 `cna-cs` checkout by relative path (`../cna-cs`) instead. Clone
 [openeggbert/cna-cs](https://github.com/openeggbert/cna-cs) next to this repository first.
 
+You also need a built CNA engine. Point at it with either variable:
+
 ```bash
-dotnet run
+CNA_NATIVE_LIBRARY=/path/to/libcna_c_api.so dotnet run
+# or, to search a directory:
+CNA_NATIVE_DIR=/path/to/build/modules/c-api dotnet run
 ```
+
+Dropping the library next to the build output works too. Without either, the loader raises
+`DllNotFoundException` naming `cna-native` and listing what it tried.
+
+**Pick your renderer deliberately.** `SDL_RENDERER` is 2D-only, so this template detects that and
+draws the bouncing logo instead of the rotating cube. `SOFTWARE` and `OPENGLES3` do 3D. The
+template prints which one it got and what it can do at startup.
 
 #### Using MonoGame
 ```bash
