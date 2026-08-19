@@ -51,8 +51,8 @@ public class HelloGame : Game
         _rendererName = GetRendererName();
         Window.Title = $"cna-cs-template - HelloGame ({_rendererName})";
 
-        _supports3D = SupportsCapability("ThreeD");
-        _supportsDepth = SupportsCapability("DepthStencilBuffer");
+        _supports3D = SupportsCapability(GraphicsCapability.ThreeD);
+        _supportsDepth = SupportsCapability(GraphicsCapability.DepthStencilBuffer);
         _hasWindow = true; // Most XNA frameworks assume a window if running
 
         if (_supports3D)
@@ -81,17 +81,29 @@ public class HelloGame : Game
 #endif
     }
 
-    private bool SupportsCapability(string capability)
+    /// <summary>
+    /// Asks the renderer what it can actually do.
+    ///
+    /// This used to probe through <c>dynamic</c> and, when the binder failed, fall back to
+    /// <c>true</c> for ThreeD and DepthStencilBuffer -- the comment above it said "assume
+    /// GraphicsDevice in CNA.Framework will have SupportsCapability". It did not, so every run took
+    /// the fallback, and on the 2D-only SDL_RENDERER this reported "3D pipeline: yes", built a
+    /// BasicEffect and died in DrawUserPrimitives.
+    ///
+    /// A capability probe whose failure mode is optimism is worse than no probe: it turns a
+    /// question with a real answer into a guess that is wrong exactly when it matters. The CNA
+    /// branch now calls the real, typed method, so a wrong answer is impossible rather than
+    /// merely unlikely.
+    ///
+    /// The XNA branch keeps returning true, and that is correct there: XNA's Reach and HiDef
+    /// profiles both guarantee 3D and a depth buffer, so there is nothing to query.
+    /// </summary>
+    private bool SupportsCapability(GraphicsCapability capability)
     {
 #if ENGINE_CNA
-        // Assume GraphicsDevice in CNA.Framework will have SupportsCapability(string/enum)
-        try { return (GraphicsDevice as dynamic).SupportsCapability(capability); } catch { return capability == "ThreeD" || capability == "DepthStencilBuffer"; }
+        return GraphicsDevice.SupportsCapability(capability);
 #else
-        // XNA 4.0 fallback: Reach vs HiDef
-        // Both Reach and HiDef support 3D and depth buffers in XNA 4.0
-        if (capability == "ThreeD") return true;
-        if (capability == "DepthStencilBuffer") return true;
-        return false;
+        return capability is GraphicsCapability.ThreeD or GraphicsCapability.DepthStencilBuffer;
 #endif
     }
 
