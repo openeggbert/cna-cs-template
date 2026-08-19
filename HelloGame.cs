@@ -25,7 +25,8 @@ public class HelloGame : Game
     private const float Maximum2DLogoScale = 1.08f;
     private const float RendererBannerSeconds = 5.0f;
     private const float AnimationSpeed = 2.0f;
-    private const int SmokeTestFrames = 3;
+    private static readonly int SmokeTestFrames =
+        int.TryParse(Environment.GetEnvironmentVariable("CNA_SMOKE_FRAMES"), out int f) ? f : 3;
 
     private static readonly VertexPositionTexture[] CubeVertices = CreateLogoCubeVertices();
 
