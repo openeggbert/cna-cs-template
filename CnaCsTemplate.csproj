@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CnaCsTemplate</RootNamespace>
+
+    <!-- CNA is the product default. The other values keep this repository useful as a source
+         portability harness; generated games can delete the unused conditional groups. -->
+    <Engine Condition="'$(Engine)' == ''">CNA</Engine>
+
+    <!-- Environment variables are imported as MSBuild properties. This repository's optional
+         sibling-checkout convenience lives in Directory.Build.props, which template.json excludes
+         from generated games. -->
+    <CnaCsRoot Condition="'$(CnaCsRoot)' == '' and '$(CNA_CS_ROOT)' != ''">$(CNA_CS_ROOT)</CnaCsRoot>
+    <FnaFrameworkPath Condition="'$(FnaFrameworkPath)' == '' and '$(FNA_FRAMEWORK_PATH)' != ''">$(FNA_FRAMEWORK_PATH)</FnaFrameworkPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Engine)' == 'CNA'">
+    <DefineConstants>$(DefineConstants);ENGINE_CNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'MonoGame'">
+    <DefineConstants>$(DefineConstants);ENGINE_MONOGAME</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'FNA'">
+    <DefineConstants>$(DefineConstants);ENGINE_FNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Engine)' == 'Kni'">
+    <DefineConstants>$(DefineConstants);ENGINE_KNI</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Engine)' == 'CNA' and '$(CnaCsRoot)' != ''">
+    <ProjectReference Include="$(CnaCsRoot)\src\CNA.XnaCompat\CNA.XnaCompat.csproj" />
+  </ItemGroup>
+
+  <Target Name="ValidateCnaReference" BeforeTargets="ResolveProjectReferences" Condition="'$(Engine)' == 'CNA'">
+    <Error Condition="'$(CnaCsRoot)' == ''"
+           Text="CNA.XnaCompat was not found. Set CNA_CS_ROOT or pass -p:CnaCsRoot=/path/to/cna-cs." />
+    <Error Condition="'$(CnaCsRoot)' != '' and !Exists('$(CnaCsRoot)\src\CNA.XnaCompat\CNA.XnaCompat.csproj')"
+           Text="CnaCsRoot='$(CnaCsRoot)' does not contain src/CNA.XnaCompat/CNA.XnaCompat.csproj." />
+  </Target>
+
+  <ItemGroup Condition="'$(Engine)' == 'MonoGame'">
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Engine)' == 'FNA' and '$(FnaFrameworkPath)' != ''">
+    <Reference Include="FNA" HintPath="$(FnaFrameworkPath)" Private="true" />
+  </ItemGroup>
+
+  <Target Name="ValidateFnaReference" BeforeTargets="ResolveReferences" Condition="'$(Engine)' == 'FNA'">
+    <Error Condition="'$(FnaFrameworkPath)' == ''"
+           Text="FNA.dll was not configured. Set FNA_FRAMEWORK_PATH or pass -p:FnaFrameworkPath=/path/to/FNA.dll." />
+    <Error Condition="'$(FnaFrameworkPath)' != '' and !Exists('$(FnaFrameworkPath)')"
+           Text="FnaFrameworkPath='$(FnaFrameworkPath)' does not exist." />
+  </Target>
+
+  <ItemGroup Condition="'$(Engine)' == 'Kni'">
+    <PackageReference Include="nkast.Xna.Framework" Version="4.2.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Content" Version="4.2.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Graphics" Version="4.2.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Input" Version="4.2.9001" />
+    <PackageReference Include="nkast.Xna.Framework.Game" Version="4.2.9001" />
+    <!-- The modular framework packages compile without registering a desktop GameFactory. -->
+    <PackageReference Include="nkast.Kni.Platform.SDL2.GL" Version="4.2.9001.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Content\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "openeggbert",
+  "classifications": ["Games", "CNA", "XNA"],
+  "identity": "OpenEggbert.CNA.Game.CSharp",
+  "name": "CNA C# XNA-style game",
+  "shortName": "cna-game",
+  "sourceName": "CnaCsTemplate",
+  "preferNameDirectory": true,
+  "description": "A native-CNA-backed C# game with portable XNA-style game code.",
+  "primaryOutputs": [
+    { "path": "CnaCsTemplate.csproj" }
+  ],
+  "sources": [
+    {
+      "modifiers": [
+        { "exclude": [".git/**", "bin/**", "obj/**", "Directory.Build.props", "scripts/**"] }
+      ]
+    }
+  ]
+}

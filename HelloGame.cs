@@ -8,7 +8,7 @@ namespace CnaCsTemplate;
 
 public class HelloGame : Game
 {
-    private GraphicsDeviceManager _graphics;
+    private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
     private BasicEffect _cubeEffect = null!;
     private Texture2D _logo = null!;
@@ -19,40 +19,38 @@ public class HelloGame : Game
     private float _animationSeconds;
     private bool _supports3D;
     private bool _supportsDepth;
-    private readonly bool _smokeTest;
+    private readonly int? _frameLimit;
     private int _drawnFrames;
 
     private const float Maximum2DLogoScale = 1.08f;
     private const float RendererBannerSeconds = 5.0f;
     private const float AnimationSpeed = 2.0f;
-    private static readonly int SmokeTestFrames =
-        int.TryParse(Environment.GetEnvironmentVariable("CNA_SMOKE_FRAMES"), out int f) ? f : 3;
-
     private static readonly VertexPositionTexture[] CubeVertices = CreateLogoCubeVertices();
 
-    public HelloGame(bool smokeTest = false)
+    public HelloGame(int? frameLimit = null)
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        _smokeTest = smokeTest;
+        _frameLimit = frameLimit;
         Window.Title = "cna-cs-template - HelloGame";
+        Window.AllowUserResizing = true;
+        Window.ClientSizeChanged += OnClientSizeChanged;
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        _logo = Content.Load<Texture2D>("logo");
+        _logo = LoadRawTexture("logo.png");
 
         _solid = new Texture2D(GraphicsDevice, 1, 1);
         _solid.SetData(new[] { Color.White });
 
-        // Probe renderer capabilities (CNA-specific or XNA fallback)
-        _rendererName = GetRendererName();
+        EngineDiagnostics.Capabilities capabilities = EngineDiagnostics.Inspect(GraphicsDevice);
+        _rendererName = capabilities.RendererName;
+        _supports3D = capabilities.Supports3D;
+        _supportsDepth = capabilities.SupportsDepth;
         Window.Title = $"cna-cs-template - HelloGame ({_rendererName})";
-
-        _supports3D = SupportsCapability(GraphicsCapability.ThreeD);
-        _supportsDepth = SupportsCapability(GraphicsCapability.DepthStencilBuffer);
 
         if (_supports3D)
         {
@@ -70,40 +68,11 @@ public class HelloGame : Game
         ReportRendererCapabilities();
     }
 
-    private string GetRendererName()
+    private Texture2D LoadRawTexture(string fileName)
     {
-        // Try to get name from CNA extension, fallback to XNA Adapter description
-#if ENGINE_CNA
-        try { return (GraphicsDevice as dynamic).GetGraphicsRendererName() ?? "CNA"; } catch { return "CNA"; }
-#else
-        return GraphicsDevice.Adapter.Description;
-#endif
-    }
-
-    /// <summary>
-    /// Asks the renderer what it can actually do.
-    ///
-    /// This used to probe through <c>dynamic</c> and, when the binder failed, fall back to
-    /// <c>true</c> for ThreeD and DepthStencilBuffer -- the comment above it said "assume
-    /// GraphicsDevice in CNA.Framework will have SupportsCapability". It did not, so every run took
-    /// the fallback, and on the 2D-only SDL_RENDERER this reported "3D pipeline: yes", built a
-    /// BasicEffect and died in DrawUserPrimitives.
-    ///
-    /// A capability probe whose failure mode is optimism is worse than no probe: it turns a
-    /// question with a real answer into a guess that is wrong exactly when it matters. The CNA
-    /// branch now calls the real, typed method, so a wrong answer is impossible rather than
-    /// merely unlikely.
-    ///
-    /// The XNA branch keeps returning true, and that is correct there: XNA's Reach and HiDef
-    /// profiles both guarantee 3D and a depth buffer, so there is nothing to query.
-    /// </summary>
-    private bool SupportsCapability(GraphicsCapability capability)
-    {
-#if ENGINE_CNA
-        return GraphicsDevice.SupportsCapability(capability);
-#else
-        return capability is GraphicsCapability.ThreeD or GraphicsCapability.DepthStencilBuffer;
-#endif
+        string path = Path.Combine(AppContext.BaseDirectory, Content.RootDirectory, fileName);
+        using Stream stream = File.OpenRead(path);
+        return Texture2D.FromStream(GraphicsDevice, stream);
     }
 
     private void ReportRendererCapabilities()
@@ -129,6 +98,12 @@ public class HelloGame : Game
 
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _animationSeconds += deltaTime;
+
+        MouseState mouse = Mouse.GetState();
+        if (mouse.LeftButton == ButtonState.Pressed)
+        {
+            _position = new Vector2(mouse.X, mouse.Y);
+        }
 
         if (!_supports3D)
         {
@@ -171,11 +146,32 @@ public class HelloGame : Game
 
         base.Draw(gameTime);
 
-        if (_smokeTest && ++_drawnFrames >= SmokeTestFrames)
+        if (_frameLimit is int limit && ++_drawnFrames >= limit)
         {
             Console.WriteLine($"cna-cs-template: smoke test drew {_drawnFrames} frames; exiting");
             Exit();
         }
+    }
+
+    protected override void UnloadContent()
+    {
+        _cubeEffect?.Dispose();
+        _solid?.Dispose();
+        _logo?.Dispose();
+        _spriteBatch?.Dispose();
+        base.UnloadContent();
+    }
+
+    private void OnClientSizeChanged(object? sender, EventArgs args)
+    {
+        if (_logo is null)
+        {
+            return;
+        }
+
+        Viewport viewport = GraphicsDevice.Viewport;
+        _position.X = Math.Clamp(_position.X, 0f, viewport.Width);
+        _position.Y = Math.Clamp(_position.Y, 0f, viewport.Height);
     }
 
     private void Draw2DLogo()
